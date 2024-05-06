@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice Notes</title>
+    <style>
+      .btnGroup {
+        position: absolute;
+        bottom: 10%;
+        left: 50%;
+      }
+      button {
+        padding: 1rem;
+        border: none;
+        background-color: rgb(41, 164, 235);
+        border-radius: 0.5rem;
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+      .voice-notes {
+        padding: 2rem;
+        display: flex;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .voice-note {
+        padding: 2rem;
+        background-color: beige;
+        font-weight: bold;
+        font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+      }
+      .voice-note:nth-child(even) {
+        background-color: rgb(89, 89, 250);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="btnGroup">
+      <button id="startBtn">Start Voice Note</button>
+      <button id="stopBtn">Stop Voice Note</button>
+    </div>
+
+    <div class="voice-notes"></div>
+    <script>
+      const startBtn = document.getElementById("startBtn");
+      const stopBtn = document.getElementById("stopBtn");
+      const voiceNotesContainer = document.querySelector(".voice-notes");
+      const recognition = new webkitSpeechRecognition();
+
+      // Set continuous listening mode
+      recognition.continuous = true;
+
+      let voiceNoteContainer = document.createElement("div");
+      voiceNoteContainer.classList.add("voice-note");
+      let voiceNoteText = "";
+
+      recognition.onresult = (event) => {
+        let transcript = event.results[event.results.length - 1][0].transcript;
+        console.log(event.results[event.results.length - 1][0].transcript);
+        console.log("se inregistreaza ceva");
+        voiceNoteText += transcript;
+      };
+
+      startBtn.addEventListener("click", () => {
+        recognition.start();
+      });
+      stopBtn.addEventListener("click", () => {
+        recognition.stop();
+        if (voiceNoteText.length > 0) {
+          voiceNoteContainer.innerText = voiceNoteText;
+          voiceNotesContainer.append(voiceNoteContainer);
+          voiceNoteText = "";
+          voiceNoteContainer = document.createElement("div");
+          voiceNoteContainer.classList.add("voice-note");
+        }
+      });
+    </script>
+  </body>
+</html>
