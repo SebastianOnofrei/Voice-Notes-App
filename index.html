@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Voice Notes</title>
     <style>
+      body {
+        background-color: rgb(53, 53, 53);
+        padding: 4rem;
+      }
+
+      h1 {
+        text-align: center;
+        font-size: 2rem;
+        color: white;
+        font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+      }
+
       .btnGroup {
         display: flex;
         gap: 1rem;
@@ -26,6 +38,7 @@
       }
       .voice-notes {
         padding: 2rem;
+        width: 100%;
         display: flex;
         justify-content: flex-start;
         flex-wrap: wrap;
@@ -34,6 +47,7 @@
 
       .voice-note {
         padding: 2rem;
+        max-width: 140px;
         background-color: beige;
         color: rgb(39, 39, 39);
         font-weight: bold;
@@ -46,18 +60,26 @@
     </style>
   </head>
   <body>
+    <h1>Voice notes</h1>
+    <div class="voice-notes"></div>
     <div class="btnGroup">
       <button id="startBtn">Start Voice Note</button>
       <button id="stopBtn">Stop Voice Note</button>
     </div>
-
-    <div class="voice-notes"></div>
     <script>
       const startBtn = document.getElementById("startBtn");
       const stopBtn = document.getElementById("stopBtn");
       const voiceNotesContainer = document.querySelector(".voice-notes");
       const recognition = new webkitSpeechRecognition();
+      let count;
+      if (localStorage.getItem("count") == null) {
+        localStorage.setItem("count", 1);
+      } else {
+        count = localStorage.getItem("count");
+      }
 
+      console.log(localStorage);
+      //Sa fac si cu local storage
       // Set continuous listening mode
       recognition.continuous = true;
 
@@ -76,15 +98,38 @@
         recognition.start();
       });
       stopBtn.addEventListener("click", () => {
+        let key = `note${count}`;
         recognition.stop();
         if (voiceNoteText.length > 0) {
           voiceNoteContainer.innerText = voiceNoteText;
           voiceNotesContainer.append(voiceNoteContainer);
+          localStorage.setItem(key, voiceNoteText);
+          localStorage.setItem("count", Number(count));
+          count = Number(count) + 1;
+          console.log(localStorage);
           voiceNoteText = "";
           voiceNoteContainer = document.createElement("div");
           voiceNoteContainer.classList.add("voice-note");
         }
       });
+
+      function renderNotesFromLocalStorage() {
+        let myVoiceNotes = { ...localStorage };
+        delete myVoiceNotes["count"];
+        //am cheile
+        let keys = Object.keys(myVoiceNotes);
+        // fac un for si append.
+        keys.forEach((key) => {
+          let voiceNoteContainer = document.createElement("div");
+          voiceNoteContainer.classList.add("voice-note");
+          voiceNoteContainer.innerText = myVoiceNotes[key];
+          voiceNotesContainer.append(voiceNoteContainer);
+        });
+        voiceNoteContainer = document.createElement("div");
+        voiceNoteContainer.classList.add("voice-note");
+      }
+
+      renderNotesFromLocalStorage();
     </script>
   </body>
 </html>
